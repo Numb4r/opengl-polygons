@@ -16,7 +16,6 @@ using namespace glm;
 
 #include <common/shader.hpp>
 #include <common/controls.hpp>
-#include <common/loadLua.hpp>
 int main( void )
 {
 	// Initialise GLFW
@@ -55,7 +54,7 @@ int main( void )
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	// Dark blue background
-	// glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -69,9 +68,11 @@ int main( void )
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "../shader/vertex.glsl", "../shader/fragment.glsl" );
+	
 
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+	
 
 	
 	// Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
@@ -114,8 +115,36 @@ int main( void )
 		-1.0f, 1.0f, 1.0f,
 		 1.0f,-1.0f, 1.0f
 	};
+	static const GLfloat g_piramid_buffer_data[]={		
+		3,1,0,
+		2,-1,1,
+		4,-1,1,
+
+		3,1,0,
+		4,-1,1,
+		4,-1,-1,
+
+		3,1,0,
+		4,-1,-1,
+		2,-1,-1,
+
+		3,1,0,
+		2,-1,-1,
+		2,-1,1,
+
+		4,-1,1,
+		2,-1,-1,
+		4,-1,-1,
+
+		2,-1,1,
+		2,-1,-1,
+		4,-1,1,
+
+
+	};
 
 	// One color for each vertex. They were generated randomly.
+	
 	static const GLfloat g_color_buffer_data[] = { 
 		0.583f,  0.771f,  0.014f,
 		0.609f,  0.115f,  0.436f,
@@ -155,6 +184,12 @@ int main( void )
 		0.982f,  0.099f,  0.879f
 	};
 
+	GLuint triangle;
+	glGenBuffers(1,&triangle);
+	glBindBuffer(GL_ARRAY_BUFFER,triangle);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(g_piramid_buffer_data),g_piramid_buffer_data,GL_STATIC_DRAW);
+
+
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -190,6 +225,7 @@ int main( void )
 		// Send our transformation to the currently bound shader, 
 		// in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -202,7 +238,7 @@ int main( void )
 			0,                  // stride
 			(void*)0            // array buffer offset
 		);
-
+		
 		// 2nd attribute buffer : colors
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
@@ -214,13 +250,27 @@ int main( void )
 			0,                                // stride
 			(void*)0                          // array buffer offset
 		);
+		
 
 		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 12*3); // 12*3 indices starting at 0 -> 12 triangles
-
+		glDrawArrays(GL_TRIANGLES, 0, sizeof(g_vertex_buffer_data)/sizeof(float)/3); // 12*3 indices starting at 0 -> 12 triangles
+		
+		
+		
+		
+		glBindBuffer(GL_ARRAY_BUFFER,triangle);
+		glVertexAttribPointer(
+			0,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			(void*)0
+		);
+		glDrawArrays(GL_TRIANGLES, 0, sizeof(g_piramid_buffer_data)/sizeof(float)*3); // 12*3 indices starting at 0 -> 12 triangles
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
-
+	
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -232,6 +282,8 @@ int main( void )
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteBuffers(1, &colorbuffer);
+	glDeleteBuffers(1,&triangle);
+	
 	glDeleteProgram(programID);
 	glDeleteVertexArrays(1, &VertexArrayID);
 
