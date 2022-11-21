@@ -34,7 +34,7 @@ int main( void )
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow( 1024, 768, "Colored Cube", NULL, NULL);
 	if( window == NULL ){
-		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
+		fprintf( stderr, "Failed to open GLFW window.\n" );
 		getchar();
 		glfwTerminate();
 		return -1;
@@ -67,7 +67,7 @@ int main( void )
 	glBindVertexArray(VertexArrayID);
 
 	// Create and compile our GLSL program from the shaders
-	GLuint programID = LoadShaders( "../shader/vertex.glsl", "../shader/fragment.glsl" );
+	GLuint programID = LoadShaders( "shader/vertex.glsl", "shader/fragment.glsl" );
 	
 
 	// Get a handle for our "MVP" uniform
@@ -75,8 +75,7 @@ int main( void )
 	
 
 	
-	// Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
-	// A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
+	
 	static const GLfloat g_vertex_buffer_data[] = { 
 		-1.0f,-1.0f,-1.0f,
 		-1.0f,-1.0f, 1.0f,
@@ -119,23 +118,18 @@ int main( void )
 		3,1,0,
 		2,-1,1,
 		4,-1,1,
-
 		3,1,0,
 		4,-1,1,
 		4,-1,-1,
-
 		3,1,0,
 		4,-1,-1,
 		2,-1,-1,
-
 		3,1,0,
 		2,-1,-1,
 		2,-1,1,
-
 		4,-1,1,
 		2,-1,-1,
 		4,-1,-1,
-
 		2,-1,1,
 		2,-1,-1,
 		4,-1,1,
@@ -206,7 +200,7 @@ int main( void )
 		double currentTime = glfwGetTime();
 		nbFrames++;
 		if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
-			// printf and reset timer
+			
 			printf("%f ms/frame\n", 1000.0/double(nbFrames));
 			nbFrames = 0;
 			lastTime += 1.0;
@@ -219,7 +213,7 @@ int main( void )
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Use our shader
+		// Use shader
 		glUseProgram(programID);
 
 		// Send our transformation to the currently bound shader, 
@@ -252,12 +246,12 @@ int main( void )
 		);
 		
 
-		// Draw the triangle !
+		// Draw the cube !
 		glDrawArrays(GL_TRIANGLES, 0, sizeof(g_vertex_buffer_data)/sizeof(float)/3); // 12*3 indices starting at 0 -> 12 triangles
 		
 		
 		
-		
+		// 3nd attribude buffer : pyramid
 		glBindBuffer(GL_ARRAY_BUFFER,triangle);
 		glVertexAttribPointer(
 			0,
@@ -267,7 +261,9 @@ int main( void )
 			0,
 			(void*)0
 		);
+		// Draw the pyramid
 		glDrawArrays(GL_TRIANGLES, 0, sizeof(g_piramid_buffer_data)/sizeof(float)*3); // 12*3 indices starting at 0 -> 12 triangles
+		
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 	

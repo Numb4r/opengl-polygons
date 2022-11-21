@@ -33,7 +33,7 @@ add_subdirectory (external)
 
 
 include_directories(
-	external/Lua542/include/
+	
 	external/AntTweakBar-1.16/include/
 	external/glfw-3.1.2/include/
 	external/glm-0.9.7.1/
@@ -59,7 +59,7 @@ add_definitions(
 )
 
 # Tutorial 1
-add_executable(tutorial01_first_window 
+add_executable(CG
 	common/shader.cpp
 	common/shader.hpp
 	common/controls.hpp
